@@ -161,11 +161,11 @@ frontend:
 
   - task: "Tile Mining View (wplace-style 2D canvas grid)"
     implemented: true
-    working: false
+    working: true
     file: "src/components/game/TileMineView.jsx"
     stuck_count: 2
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
@@ -176,14 +176,17 @@ frontend:
         - working: false
           agent: "testing"
           comment: "BUG 2 NOT FIXED ✗ - Mining clicks do NOT work. Canvas renders correctly, drag-to-pan works, scroll-to-zoom works, but clicking tiles does nothing. ROOT CAUSE: activeTool is undefined in GameContext because it's not exported in the context value object (line 142-148 of GameContext.jsx). The activeTool is computed at line 60-63 but never added to the value object, so components get undefined and the ?? 0 fallback shows 0/0 uses. Player in localStorage has correct tool with 100/100 uses."
+        - working: true
+          agent: "testing"
+          comment: "BUG 2 FIXED ✓ - Mining now works correctly! activeTool export was added to GameContext value object (line 144). Verified: clicking tiles changes their color from dark grey to cyan/green/yellow, uses counter decrements correctly (100→99→98), drag-to-pan works, scroll-to-zoom works. Tested with 50+ clicks. Minor issue: BACK TO ORBIT button is blocked by HUD overlay (z-index conflict - button has z-10, HUD has z-20), but this doesn't affect core mining functionality."
 
   - task: "HUD - tool uses indicator (centered, prominent)"
     implemented: true
-    working: false
+    working: true
     file: "src/components/game/HUD.jsx"
     stuck_count: 2
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
@@ -194,14 +197,17 @@ frontend:
         - working: false
           agent: "testing"
           comment: "BUG 3 PARTIALLY FIXED - HUD displays numbers (not just '/'), but shows '0/0 USES' instead of '100/100 USES'. The ?? 0 fallback is working, but activeTool is undefined due to missing export in GameContext value object. Tool name (Mk1), tier (TIER 1), boost (+10%), and range (RANGE 1) display correctly from TIER_DATA, but uses/maxUses show 0/0 because activeTool is undefined."
+        - working: true
+          agent: "testing"
+          comment: "BUG 3 FIXED ✓ - HUD now displays correctly! Shows 'Mk1 TIER 1' on line 1, '100/100 USES +10% BOOST · RANGE 1' on line 2. Uses counter is prominent and visible, decrements correctly after each mining click (100→99→98). Desktop HUD centered at top, mobile HUD below top bar. Currency pills (GEMS/USDC/MINEX) display correctly top-right. Durability progress bar at bottom shows correct percentage. All HUD elements working as designed."
 
   - task: "Reward Popup (matches screenshot design)"
     implemented: true
-    working: "NA"
+    working: true
     file: "src/components/game/RewardPopup.jsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
@@ -209,6 +215,9 @@ frontend:
         - working: "NA"
           agent: "testing"
           comment: "Could not test reward popup because mining doesn't work (activeTool undefined issue). Popup will only appear after successful mining that yields rewards. Need to fix activeTool export first."
+        - working: true
+          agent: "testing"
+          comment: "Reward popup works perfectly! Appears after ~10 mining clicks (RNG-based). Shows: 'YOU HAVE FOUND!' header, large gem icon with glow effect, '463 GEMS' in large white text, 'MAX VALUE: 421 GEMS', 'TOOL EFFICIENCY: x 10%', 'YOU EARNED: 463 GEMS', and large yellow 'COLLECT' button. Design matches requirements. Player's reward also appears in live feed. Popup is centered, has proper styling with dark background and yellow accents."
 
   - task: "Shop / Inventory / Wallet / Profile drawers"
     implemented: true
@@ -239,6 +248,9 @@ frontend:
         - working: true
           agent: "testing"
           comment: "Live feed visible in tile view on left side. Shows simulated player mining events with nicknames and rewards. Updates periodically. Collapsible with X button."
+        - working: true
+          agent: "testing"
+          comment: "Live feed confirmed working correctly. Positioned on left side of tile view. Shows '244 ONLINE' counter at top. Displays player mining events with format: 'PlayerName found X GEMS/USDC/MINEX' with timestamps (1s, 3s, 6s, etc.). Player's own rewards appear in feed after mining (e.g., 'Stardust988 found 463 GEMS 1s'). Feed updates with simulated other players every ~2.4s. Collapsible with X button. Proper styling with dark background and colored icons for different reward types."
 
 backend:
   - task: "Not started yet - frontend with mocked data only"
@@ -261,13 +273,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Tile Mining View (wplace-style 2D canvas grid)"
-    - "HUD - tool uses indicator (centered, prominent)"
-  stuck_tasks:
-    - "Tile Mining View (wplace-style 2D canvas grid)"
-    - "HUD - tool uses indicator (centered, prominent)"
+    - "BACK TO ORBIT button z-index issue"
+  stuck_tasks: []
   test_all: false
-  test_priority: "stuck_first"
+  test_priority: "high_first"
 
 agent_communication:
     - agent: "main"
@@ -328,3 +337,34 @@ agent_communication:
         ✓ Live feed visible and updating
         
         Once activeTool is exported, mining should work and reward popup can be tested.
+    - agent: "main"
+      message: |
+        Fixed the critical bug by adding activeTool to GameContext value object (line 144).
+        Please re-test to verify mining and HUD now work correctly.
+    - agent: "testing"
+      message: |
+        RE-TEST COMPLETE - CRITICAL FIX VERIFIED ✓
+        
+        The activeTool export fix is working! All core game functionality now operational:
+        
+        ✅ VERIFIED WORKING:
+        1. Mining works - tiles change color when clicked (dark grey → cyan/green/yellow)
+        2. Uses counter works - displays "100/100 USES" initially, decrements correctly (100→99→98...)
+        3. HUD displays correctly - "Mk1 TIER 1" + "100/100 USES +10% BOOST · RANGE 1" all visible
+        4. Reward popup works - appears after ~10 clicks, shows "YOU HAVE FOUND! 463 GEMS" with MAX VALUE, TOOL EFFICIENCY, YOU EARNED, and yellow COLLECT button
+        5. Live feed works - shows player's own rewards + simulated other players, "244 ONLINE" counter
+        6. Shop drawer works - shows all 5 tool tiers (Mk1-Mk5) with correct prices
+        7. Wallet drawer works - shows GEMS/USDC/MINEX currency cards
+        8. Inventory drawer works - shows starter tool with REPAIR button
+        9. Drag-to-pan works - doesn't trigger mining when dragging
+        10. Scroll-to-zoom works - zoom indicator shows "Z 100%"
+        11. Durability bar works - shows correct percentage at bottom
+        
+        ⚠️ MINOR ISSUES (not blocking core functionality):
+        1. BACK TO ORBIT button is blocked by HUD overlay - z-index conflict (button has z-10, HUD has z-20). Button is positioned at center-top on desktop (md:top-5 md:left-1/2) which overlaps with HUD tool indicator that has pointer-events-auto. Even force click doesn't work. FIX: Either increase button z-index to z-30, or reposition button, or move button into HUD component with proper pointer-events-auto.
+        
+        2. Profile drawer - avatar click selector issue during automated test, but this is minor and doesn't affect core gameplay.
+        
+        3. Mobile responsive - PLAY NOW button correctly hidden on mobile (uses hamburger menu instead), which is proper responsive design. Not a bug.
+        
+        RECOMMENDATION: Fix the BACK TO ORBIT button z-index issue so players can return to orbit view. This is the only remaining functional issue. All other core features are working correctly.

@@ -141,6 +141,7 @@ export function GameProvider({ children }) {
 
   const value = {
     player, setPlayer, login, logout,
+    activeTool,
     consumeToolUses, addReward,
     buyTool, repairTool, setActiveTool,
     liveFeed, onlineCount, pushFeedEvent,
