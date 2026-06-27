@@ -3,7 +3,7 @@ import { Coins } from 'lucide-react';
 
 export default function OctSection() {
   return (
-    <section id="oct" className="relative py-20 md:py-28 bg-black overflow-hidden">
+    <section id="minex" className="relative py-20 md:py-28 bg-black overflow-hidden">
       <div className="px-5 md:px-10 max-w-7xl mx-auto">
         <div className="flex items-baseline gap-4 mb-10">
           <span className="font-mono text-xs tracking-[0.2em] text-yellow-400">// SEC 02</span>
@@ -12,15 +12,18 @@ export default function OctSection() {
 
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="font-display text-white text-[16vw] md:text-[8rem] leading-none">$OCT</h2>
+            <h2 className="font-display text-white text-[16vw] md:text-[8rem] leading-none">$MINEX</h2>
             <p className="font-mono text-sm text-stone-400 mt-6 max-w-md leading-relaxed">
-              Each black cell of the Octahedron holds <span className="text-yellow-400">$OCT</span> — a native token, the most valuable treasure and ultimate catalyst for progress.
+              Each black cell of the Minexdron holds <span className="text-yellow-400">$MINEX</span> — the native token, the most valuable treasure and the ultimate catalyst for progress.
               With a finite supply, it&apos;s the key to unlocking superior tools.
             </p>
+            <p className="font-mono text-[11px] tracking-[0.18em] text-stone-500 mt-3">
+              // TOKEN NOT DEPLOYED YET — STATS LOCKED
+            </p>
             <div className="mt-8 grid grid-cols-3 gap-3">
-              <Stat label="SUPPLY" value="21M" />
-              <Stat label="MINED" value="4.32M" />
-              <Stat label="BURNED" value="108K" />
+              <Stat label="SUPPLY" value="—" />
+              <Stat label="MINED" value="—" />
+              <Stat label="BURNED" value="—" />
             </div>
           </div>
 

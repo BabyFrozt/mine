@@ -1,13 +1,7 @@
 import React from 'react';
 import { useGame } from '../../context/GameContext';
-import { Gem, DollarSign, Sparkles, Coins } from 'lucide-react';
-
-const META = {
-  gems: { label: 'GEMS', Icon: Gem, color: '#22d3ee' },
-  usdc: { label: 'USDC', Icon: DollarSign, color: '#22c55e' },
-  minex: { label: '$MINEX', Icon: Sparkles, color: '#facc15' },
-  zonk: { label: 'ZONK', Icon: Coins, color: '#737373' },
-};
+import { ITEM_NAMES, ITEM_COLORS, formatCoords } from '../../mock';
+import { Activity } from 'lucide-react';
 
 function relTime(ts) {
   const s = Math.floor((Date.now() - ts) / 1000);
@@ -21,35 +15,48 @@ export default function LiveFeed() {
   const { liveFeed, onlineCount } = useGame();
 
   return (
-    <div className="w-full md:w-72 bg-black/85 border border-yellow-400/25 backdrop-blur-sm flex flex-col h-full">
+    <div className="w-full md:w-80 bg-black/85 border border-yellow-400/25 backdrop-blur-sm flex flex-col h-full">
       <div className="px-4 py-3 border-b border-yellow-400/20 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-green-400 pulse-dot" />
-          <span className="font-mono text-[11px] tracking-[0.2em] text-yellow-400">LIVE FEED</span>
+          <Activity className="w-3.5 h-3.5 text-yellow-400" />
+          <span className="font-mono text-[11px] tracking-[0.2em] text-yellow-400">// LIVE ACTIVITY</span>
         </div>
-        <span className="font-mono text-[10px] tracking-[0.2em] text-stone-400">{onlineCount} ONLINE</span>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-green-400 pulse-dot" />
+          <span className="font-mono text-[10px] tracking-[0.2em] text-stone-400">LIVE</span>
+        </div>
       </div>
       <div className="flex-1 overflow-y-auto no-scrollbar">
         {liveFeed.length === 0 && (
           <div className="p-4 font-mono text-xs text-stone-500">// Awaiting events...</div>
         )}
         {liveFeed.map((ev) => {
-          const m = META[ev.reward?.type] || META.gems;
-          const Icon = m.Icon;
-          const v = ev.reward.type === 'usdc' ? `$${ev.reward.final}` : `${ev.reward.final?.toLocaleString?.() ?? ev.reward.final}`;
+          const rType = ev.reward?.type || 'gems';
+          const itemName = ITEM_NAMES[rType] || 'Item';
+          const color = ITEM_COLORS[rType] || '#a78bfa';
+          const coords = ev.coords ? formatCoords(ev.coords.x, ev.coords.y) : '0,0,0';
           return (
-            <div key={ev.id} className="px-4 py-2.5 border-b border-yellow-400/10 flex items-center gap-3 hover:bg-yellow-400/5 transition-colors">
-              <div className="w-8 h-8 rounded-md flex items-center justify-center" style={{ background: `${m.color}22`, border: `1px solid ${m.color}55` }}>
-                <Icon className="w-4 h-4" style={{ color: m.color }} />
+            <div key={ev.id} className="px-3 py-2 border-b border-yellow-400/10 hover:bg-yellow-400/5 transition-colors">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <span className="w-2.5 h-2.5 shrink-0" style={{ background: color }} />
+                  <span className="font-mono text-xs text-yellow-400 truncate">{ev.nick}</span>
+                  <span className="font-mono text-[11px] text-stone-500">excavated</span>
+                  <span className="font-mono text-[11px] font-bold truncate" style={{ color }}>{itemName}</span>
+                </div>
+                <span className="font-mono text-[10px] text-stone-600 shrink-0">{relTime(ev.ts)}</span>
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="font-mono text-xs text-stone-200 truncate">{ev.nick}</div>
-                <div className="font-mono text-[10px] text-stone-500">found {v} {m.label}</div>
+              <div className="flex items-center justify-between mt-0.5 pl-4.5">
+                <span className="font-mono text-[10px] text-stone-600 ml-4.5">{ev.reward?.final ? (rType === 'usdc' ? `$${ev.reward.final}` : `+${ev.reward.final.toLocaleString()}`) : ''}</span>
+                <span className="font-mono text-[10px] text-stone-600">{coords}</span>
               </div>
-              <span className="font-mono text-[10px] text-stone-600 shrink-0">{relTime(ev.ts)}</span>
             </div>
           );
         })}
+      </div>
+      <div className="px-3 py-2 border-t border-yellow-400/20 flex items-center justify-between">
+        <span className="font-mono text-[10px] tracking-[0.2em] text-stone-500">// ON-SITE</span>
+        <span className="font-mono text-[10px] tracking-[0.2em] text-yellow-400">{onlineCount} MINERS</span>
       </div>
     </div>
   );

@@ -5,8 +5,7 @@ export default function Navbar({ onLoginClick, onPlayClick }) {
   const [open, setOpen] = useState(false);
   const nav = [
     { label: 'MISSION', id: 'mission' },
-    { label: '$OCT', id: 'oct' },
-    { label: 'ABOUT', id: 'about' },
+    { label: '$MINEX', id: 'minex' },
     { label: 'MARKETPLACE', id: 'marketplace' },
   ];
   const scrollTo = (id) => {
@@ -19,7 +18,7 @@ export default function Navbar({ onLoginClick, onPlayClick }) {
       <div className="px-5 md:px-10 py-4 flex items-center justify-between">
         <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-2 font-display text-white tracking-tight">
           <Diamond />
-          <span className="text-xl md:text-2xl">THE OCT</span>
+          <span className="text-xl md:text-2xl">MINEX BLOCK</span>
         </button>
 
         <nav className="hidden md:flex items-center gap-8 font-mono text-[12px] tracking-[0.18em] text-stone-300">

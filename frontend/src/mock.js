@@ -1,4 +1,4 @@
-// Mock data for Mines Block (frontend-only MVP)
+// Mock data + drop economy for MineX Block
 
 export const TIER_DATA = {
   1: { name: 'Mk1', range: 1, maxUses: 100, durability: 100, repairCost: 200, boost: 10, color: '#9ca3af', priceGems: 2000, priceUsdc: null },
@@ -8,29 +8,86 @@ export const TIER_DATA = {
   5: { name: 'Mk5', range: 15, maxUses: 1500, durability: 1500, repairCost: 6, boost: 120, color: '#f97316', priceGems: null, priceUsdc: 70 },
 };
 
-export const USDC_DROPS = [
-  { value: 0.1, weight: 50 },
-  { value: 0.3, weight: 20 },
-  { value: 0.5, weight: 15 },
-  { value: 1, weight: 10 },
-  { value: 2.5, weight: 3 },
-  { value: 5, weight: 2 },
-];
+// Dynamic difficulty brackets based on player's USDC balance (Option C)
+export function getBracket(usdc) {
+  if (usdc < 2) return 'A';
+  if (usdc < 5) return 'B';
+  if (usdc < 8) return 'C';
+  if (usdc < 10) return 'D';
+  return 'A'; // Resets after WD (or when balance returns under 2)
+}
 
-export const REWARD_TYPES = {
-  ZONK: 'zonk',
-  GEMS: 'gems',
-  USDC: 'usdc',
-  MINEX: 'minex',
+export const BRACKET_LABEL = {
+  A: 'EASY',
+  B: 'MEDIUM',
+  C: 'HARD',
+  D: 'BRUTAL',
 };
 
-// Probability for a single mined block to drop something
-export const DROP_TABLE = [
-  { type: 'zonk', weight: 55 },
-  { type: 'gems', weight: 30 },
-  { type: 'usdc', weight: 12 },
-  { type: 'minex', weight: 3 },
-];
+const DROP_TABLES = {
+  A: [
+    { type: 'zonk', weight: 55 },
+    { type: 'gems', weight: 30 },
+    { type: 'usdc', weight: 13 },
+    { type: 'minex', weight: 2 },
+  ],
+  B: [
+    { type: 'zonk', weight: 75 },
+    { type: 'gems', weight: 16 },
+    { type: 'usdc', weight: 8 },
+    { type: 'minex', weight: 1 },
+  ],
+  C: [
+    { type: 'zonk', weight: 88 },
+    { type: 'gems', weight: 8 },
+    { type: 'usdc', weight: 3.5 },
+    { type: 'minex', weight: 0.5 },
+  ],
+  D: [
+    { type: 'zonk', weight: 94 },
+    { type: 'gems', weight: 4.3 },
+    { type: 'usdc', weight: 1.5 },
+    { type: 'minex', weight: 0.2 },
+  ],
+};
+
+const USDC_DROPS_BY_BRACKET = {
+  A: [
+    { value: 0.05, weight: 60 },
+    { value: 0.10, weight: 25 },
+    { value: 0.20, weight: 10 },
+    { value: 0.50, weight: 4 },
+    { value: 1.00, weight: 1 },
+  ],
+  B: [
+    { value: 0.05, weight: 70 },
+    { value: 0.10, weight: 20 },
+    { value: 0.20, weight: 7 },
+    { value: 0.50, weight: 2.5 },
+    { value: 1.00, weight: 0.5 },
+  ],
+  C: [
+    { value: 0.05, weight: 80 },
+    { value: 0.10, weight: 15 },
+    { value: 0.20, weight: 4 },
+    { value: 0.50, weight: 1 },
+  ],
+  D: [
+    { value: 0.05, weight: 90 },
+    { value: 0.10, weight: 9 },
+    { value: 0.20, weight: 1 },
+  ],
+};
+
+const GEMS_RANGE = {
+  A: [80, 400],
+  B: [50, 250],
+  C: [30, 150],
+  D: [20, 100],
+};
+
+// $MINEX flat range per user request
+const MINEX_RANGE = [1000, 3500];
 
 export function weightedPick(table) {
   const total = table.reduce((s, x) => s + x.weight, 0);
@@ -42,29 +99,47 @@ export function weightedPick(table) {
   return table[table.length - 1];
 }
 
-export function rollReward(toolTier) {
-  const pick = weightedPick(DROP_TABLE);
+export function rollReward(toolTier, usdcBalance = 0) {
+  const bracket = getBracket(usdcBalance);
+  const table = DROP_TABLES[bracket];
+  const pick = weightedPick(table);
   const boost = TIER_DATA[toolTier]?.boost || 0;
   const mult = 1 + boost / 100;
-  if (pick.type === 'zonk') return { type: 'zonk', base: 0, final: 0, boost };
+  if (pick.type === 'zonk') return { type: 'zonk', base: 0, final: 0, boost, bracket };
   if (pick.type === 'gems') {
-    const base = Math.floor(100 + Math.random() * 1100);
-    return { type: 'gems', base, final: Math.floor(base * mult), boost };
+    const [lo, hi] = GEMS_RANGE[bracket];
+    const base = Math.floor(lo + Math.random() * (hi - lo + 1));
+    return { type: 'gems', base, final: Math.floor(base * mult), boost, bracket };
   }
   if (pick.type === 'usdc') {
-    const drop = weightedPick(USDC_DROPS);
+    const drop = weightedPick(USDC_DROPS_BY_BRACKET[bracket]);
     const base = drop.value;
-    return { type: 'usdc', base, final: +(base * mult).toFixed(4), boost };
+    return { type: 'usdc', base, final: +(base * mult).toFixed(4), boost, bracket };
   }
   if (pick.type === 'minex') {
-    const base = Math.floor(2000 + Math.random() * 3001);
-    return { type: 'minex', base, final: Math.floor(base * mult), boost };
+    const base = Math.floor(MINEX_RANGE[0] + Math.random() * (MINEX_RANGE[1] - MINEX_RANGE[0] + 1));
+    return { type: 'minex', base, final: Math.floor(base * mult), boost, bracket };
   }
-  return { type: 'zonk', base: 0, final: 0, boost };
+  return { type: 'zonk', base: 0, final: 0, boost, bracket };
 }
 
+// Item display names for live feed
+export const ITEM_NAMES = {
+  zonk: 'Dust',
+  gems: 'Graphene Gem',
+  usdc: '$USDC Shard',
+  minex: '$MINEX Crystal',
+};
+
+export const ITEM_COLORS = {
+  zonk: '#a78bfa',
+  gems: '#22d3ee',
+  usdc: '#22c55e',
+  minex: '#facc15',
+};
+
 export const MOCK_NICKNAMES = [
-  'Gon_Freecs', 'Killua', 'NanoMiner', 'OrbitHunter', 'VoidWalker', 'GemFiend',
+  'Wegoim1', 'Killua', 'NanoMiner', 'OrbitHunter', 'VoidWalker', 'GemFiend',
   'CryoDigger', 'NeonProspect', 'Tycho', 'Zephyrus', 'OctaPrime', 'Stardust',
   'Cobalt', 'Nyx', 'Quasar', 'Magnetar', 'Helios', 'Andromeda',
 ];
@@ -87,14 +162,20 @@ export const INITIAL_PLAYER = {
   joinedAt: new Date().toISOString(),
 };
 
-export const MOCK_LIVE_FEED_SEED = [
-  { id: 1, nick: 'Cobalt_42', reward: { type: 'usdc', final: 0.3 }, ts: Date.now() - 1000 },
-  { id: 2, nick: 'Tycho_98', reward: { type: 'gems', final: 850 }, ts: Date.now() - 5000 },
-  { id: 3, nick: 'NanoMiner_12', reward: { type: 'minex', final: 2300 }, ts: Date.now() - 9000 },
-];
+export const MOCK_LIVE_FEED_SEED = [];
 
 export const GACHA_BOXES = [
   { id: 'bronze', name: 'Bronze Crate', color: '#b08152', price: 1000, currency: 'gems', odds: 'Mk1 90% · Mk2 10%' },
   { id: 'silver', name: 'Silver Crate', color: '#c0c4cc', price: 10, currency: 'usdc', odds: 'Mk2 70% · Mk3 25% · Mk4 5%' },
   { id: 'gold', name: 'Gold Crate', color: '#f5c84b', price: 35, currency: 'usdc', odds: 'Mk3 50% · Mk4 35% · Mk5 15%' },
 ];
+
+// Random tile coordinate display (centered around origin)
+export function formatCoords(x, y) {
+  const cx = x - 100;
+  const cy = y - 70;
+  // fake depth from hash
+  const h = ((x * 73856093) ^ (y * 19349663)) >>> 0;
+  const cz = ((h & 7) - 3);
+  return `${cx},${cy},${cz}`;
+}

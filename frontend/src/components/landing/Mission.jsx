@@ -2,7 +2,7 @@ import React from 'react';
 import { Pickaxe, Wrench, Gem, RotateCcw } from 'lucide-react';
 
 const items = [
-  { num: '01', title: 'MINE BLOCKS', icon: Pickaxe, desc: 'Click voxels on the Octahedron. Every block has a chance to drop GEMS, USDC, $MINEX, or zonk.' },
+  { num: '01', title: 'MINE BLOCKS', icon: Pickaxe, desc: 'Click voxels on the Minexdron. Every block has a chance to drop GEMS, USDC, $MINEX, or zonk.' },
   { num: '02', title: 'UPGRADE TOOLS', icon: Wrench, desc: 'Buy Mk2–Mk5 tools. Bigger range, more uses, higher reward boost.' },
   { num: '03', title: 'COLLECT TREASURE', icon: Gem, desc: 'Find rare drops. $USDC payouts roll from a hidden lucky-table. Best of luck, miner.' },
   { num: '04', title: 'REPAIR & REPEAT', icon: RotateCcw, desc: 'Repair broken tools. Boost rewards. Repeat — the Orbit refills every 24h.' },

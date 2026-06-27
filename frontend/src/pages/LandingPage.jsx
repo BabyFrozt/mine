@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Navbar from '../components/landing/Navbar';
 import Hero from '../components/landing/Hero';
 import Mission from '../components/landing/Mission';
 import OctSection from '../components/landing/OctSection';
 import Artefacts from '../components/landing/Artefacts';
 import EquipmentSection from '../components/landing/EquipmentSection';
-import AboutSection from '../components/landing/AboutSection';
 import Marketplace from '../components/landing/Marketplace';
 import Footer from '../components/landing/Footer';
 import AuthModal from '../components/landing/AuthModal';
 import { useGame } from '../context/GameContext';
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 export default function LandingPage() {
   const [authOpen, setAuthOpen] = useState(false);
@@ -18,7 +18,7 @@ export default function LandingPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = 'MINES BLOCK · Excavate. Protect. Profit.';
+    document.title = 'MINEX BLOCK · Excavate. Protect. Profit.';
   }, []);
 
   const handlePlay = () => {
@@ -34,7 +34,6 @@ export default function LandingPage() {
       <OctSection />
       <Artefacts />
       <EquipmentSection />
-      <AboutSection />
       <Marketplace />
       <Footer />
       <AuthModal open={authOpen} onOpenChange={setAuthOpen} />

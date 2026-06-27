@@ -27,12 +27,15 @@ export function GameProvider({ children }) {
       // Random reward event from another player
       if (Math.random() < 0.7) {
         const tier = 1 + Math.floor(Math.random() * 5);
-        const r = rollReward(tier);
+        const fakeUsdc = Math.random() * 8; // simulate various brackets
+        const r = rollReward(tier, fakeUsdc);
         if (r.type === 'zonk') return;
         const nick = randomNick();
+        const x = Math.floor(Math.random() * 200);
+        const y = Math.floor(Math.random() * 140);
         setLiveFeed((prev) => [
-          { id: Date.now() + Math.random(), nick, reward: r, ts: Date.now() },
-          ...prev.slice(0, 19),
+          { id: Date.now() + Math.random(), nick, reward: r, coords: { x, y }, ts: Date.now() },
+          ...prev.slice(0, 24),
         ]);
       }
       // wiggle online count

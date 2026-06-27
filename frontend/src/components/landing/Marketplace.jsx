@@ -11,7 +11,7 @@ export default function Marketplace() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-5">
-          <Card title="MARKETPLACE" icon={Store} desc="Trade rare tools, gems and boosters with other miners. 5% Consortium commission." status="COMING SOON" />
+          <Card title="MARKETPLACE" icon={Store} desc="Trade rare tools, gems and boosters with other miners. 5% commission." status="COMING SOON" />
           <Card title="FOUNDRY" icon={Coins} desc="Cash out your USDC prize pool. Withdrawals settle to your wallet in under 24h." status="COMING SOON" />
         </div>
       </div>

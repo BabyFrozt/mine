@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import { Dialog, DialogContent } from '../ui/dialog';
 import { Button } from '../ui/button';
-import { Coins, Gem, DollarSign, Sparkles, Info } from 'lucide-react';
+import { Gem, DollarSign, Sparkles, Info } from 'lucide-react';
 import { useGame } from '../../context/GameContext';
 
 const META = {
-  gems: { label: 'GEMS', Icon: Gem, color: '#22d3ee', maxName: 'MAX VALUE' },
-  usdc: { label: 'USDC', Icon: DollarSign, color: '#22c55e', maxName: 'MAX VALUE' },
-  minex: { label: '$MINEX', Icon: Sparkles, color: '#facc15', maxName: 'MAX VALUE' },
+  gems: { label: 'GEMS', Icon: Gem, color: '#22d3ee' },
+  usdc: { label: 'USDC', Icon: DollarSign, color: '#22c55e' },
+  minex: { label: '$MINEX', Icon: Sparkles, color: '#facc15' },
 };
 
 export default function RewardPopup() {
@@ -34,7 +34,7 @@ export default function RewardPopup() {
     <Dialog open={open} onOpenChange={(v) => !v && setRewardPopup(null)}>
       <DialogContent className="bg-black border-yellow-400/40 text-stone-200 max-w-md p-0 overflow-hidden">
         <div className="px-6 pt-6 pb-3 border-b border-yellow-400/20 flex items-center justify-between">
-          <span className="font-mono text-[11px] tracking-[0.2em] text-yellow-400">// MINES BLOCK</span>
+          <span className="font-mono text-[11px] tracking-[0.2em] text-yellow-400">// MINEX BLOCK</span>
           <span className="font-mono text-[10px] tracking-[0.2em] text-stone-500">REWARD-DROP</span>
         </div>
         <div className="px-6 py-8 flex flex-col items-center text-center">

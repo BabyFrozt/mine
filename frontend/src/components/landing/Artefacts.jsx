@@ -16,7 +16,7 @@ export default function Artefacts() {
         </div>
         <h2 className="font-display text-white text-[14vw] md:text-[8rem] leading-none">ARTEFACTS</h2>
         <p className="font-mono text-sm text-stone-400 mt-6 max-w-2xl">
-          The OCT is rich with valuable artefacts. Some boost your equipment; rare ones can be exchanged for $USDC, crypto, or physical items at the Foundry.
+          The Minexdron is rich with valuable artefacts. Some boost your equipment; rare ones can be exchanged for $USDC, crypto, or physical items at the Foundry.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-14">

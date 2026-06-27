@@ -15,35 +15,31 @@ export default function Hero({ onPlayClick }) {
 
   return (
     <section id="hero" className="relative min-h-screen bg-grid pt-28 pb-16 overflow-hidden">
-      {/* glow */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[900px] h-[700px] rounded-full blur-3xl opacity-30" style={{ background: 'radial-gradient(closest-side, rgba(250,204,21,0.45), transparent 70%)' }} />
       </div>
 
       <div className="relative px-5 md:px-10">
-        {/* Top label row */}
         <div className="grid grid-cols-2 gap-3 md:gap-6 max-w-6xl mx-auto mt-4">
           <div className="border border-yellow-400/40 p-3 font-mono text-[10px] md:text-xs tracking-[0.18em] text-stone-300">
             BULLETIN {seed}
             <span className="text-yellow-400 ml-2 term-cursor">_</span>
           </div>
           <div className="border border-yellow-400/40 p-3 font-mono text-[10px] md:text-xs tracking-[0.18em] text-stone-300">
-            OCTAHEDRON ENTERED ORBIT
+            MINEXDRON ENTERED ORBIT
           </div>
         </div>
 
-        {/* Headline */}
         <h1 className="font-display text-white mt-10 md:mt-14 max-w-7xl mx-auto leading-[0.86] text-[16vw] md:text-[11vw] lg:text-[9.5rem]">
           <div>EXCAVATE.</div>
           <div className="md:pl-[6vw]">PROTECT.</div>
           <div className="md:pl-[14vw]">PROFIT.</div>
         </h1>
 
-        {/* Sub row */}
         <div className="mt-10 md:mt-14 max-w-6xl mx-auto grid md:grid-cols-3 gap-6 items-end">
           <p className="text-stone-400 font-mono text-xs md:text-sm leading-relaxed md:col-span-2">
-            <span className="text-yellow-400">_____</span> A mysterious Octahedron has arrived in low-Earth orbit.
-            Join the Consortium of miners, dig through its voxel shell, claim $GEMS, $MINEX and $USDC.
+            <span className="text-yellow-400">_____</span> A mysterious Minexdron has arrived in low-Earth orbit.
+            Join the miners, dig through its voxel shell, claim $GEMS, $MINEX and $USDC.
             <br />Mine alongside <span className="text-yellow-400 font-bold">{onlineCount}</span> players online right now.
           </p>
           <div className="flex flex-col gap-3">
@@ -58,7 +54,6 @@ export default function Hero({ onPlayClick }) {
           </div>
         </div>
 
-        {/* Voxel pyramid illustration */}
         <div className="relative max-w-5xl mx-auto mt-12 md:mt-16">
           <VoxelPyramidStatic />
         </div>
@@ -68,7 +63,6 @@ export default function Hero({ onPlayClick }) {
 }
 
 function VoxelPyramidStatic() {
-  // SVG isometric voxel octahedron silhouette
   return (
     <div className="relative aspect-[16/9] rounded-3xl overflow-hidden border border-yellow-400/20 bg-black">
       <div className="absolute inset-0 bg-grid-tight opacity-60" />
@@ -88,27 +82,23 @@ function VoxelPyramidStatic() {
           </linearGradient>
         </defs>
         <g transform="translate(400,225)">
-          {/* Top half */}
           <polygon points="0,-180 220,0 0,0" fill="url(#g2)" stroke="#facc15" strokeOpacity="0.5" />
           <polygon points="0,-180 -220,0 0,0" fill="url(#g1)" stroke="#facc15" strokeOpacity="0.4" />
-          {/* Bottom half */}
           <polygon points="0,180 220,0 0,0" fill="url(#g1)" stroke="#facc15" strokeOpacity="0.5" />
           <polygon points="0,180 -220,0 0,0" fill="url(#g2)" stroke="#facc15" strokeOpacity="0.4" />
-          {/* Voxel grid simulated lines */}
           {Array.from({ length: 10 }).map((_, i) => (
             <line key={'h' + i} x1={-220 + i * 44} y1={0} x2={0} y2={-180 + (i * 18)} stroke="#facc15" strokeOpacity="0.18" />
           ))}
           {Array.from({ length: 10 }).map((_, i) => (
             <line key={'v' + i} x1={i * 22} y1={-180 + i * 18} x2={i * 22 - 220} y2={i * 18} stroke="#facc15" strokeOpacity="0.14" />
           ))}
-          {/* gem highlights */}
           <polygon points="-30,-60 -10,-50 -10,-30 -30,-20 -50,-30 -50,-50" fill="url(#g3)" />
           <polygon points="60,20 80,30 80,50 60,60 40,50 40,30" fill="#a78bfa" opacity="0.7" />
           <polygon points="-90,40 -70,50 -70,70 -90,80 -110,70 -110,50" fill="#22d3ee" opacity="0.7" />
         </g>
       </svg>
       <div className="absolute bottom-3 left-4 font-mono text-[10px] tracking-[0.18em] text-stone-400">
-        // VOXEL OCTAHEDRON · ORBIT 04-X
+        // MINEXDRON · ORBIT 04-X
       </div>
       <div className="absolute top-3 right-4 font-mono text-[10px] tracking-[0.18em] text-yellow-400">
         STATUS: <span className="text-green-400">LIVE</span>
