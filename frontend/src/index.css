@@ -1,0 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: 'Archivo', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #000;
+  color: #e7e5e4;
+  overscroll-behavior: none;
+}
+
+.font-mono { font-family: 'JetBrains Mono', monospace; }
+.font-display { font-family: 'Archivo Black', 'Archivo', sans-serif; letter-spacing: -0.02em; }
+
+@layer base {
+  :root {
+    --background: 0 0% 0%;
+    --foreground: 30 6% 90%;
+    --card: 0 0% 4%;
+    --card-foreground: 30 6% 90%;
+    --popover: 0 0% 4%;
+    --popover-foreground: 30 6% 90%;
+    --primary: 48 96% 53%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 30 6% 90%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 30 4% 60%;
+    --accent: 48 96% 53%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 16%;
+    --input: 0 0% 16%;
+    --ring: 48 96% 53%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  body { @apply bg-background text-foreground; }
+}
+
+/* Grid background pattern from screenshot */
+.bg-grid {
+  background-color: #000;
+  background-image:
+    linear-gradient(rgba(250, 204, 21, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(250, 204, 21, 0.06) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+.bg-grid-tight {
+  background-image:
+    linear-gradient(rgba(250, 204, 21, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(250, 204, 21, 0.08) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.vignette::after {
+  content: '';
+  position: absolute; inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.85) 100%);
+}
+
+/* Yellow glow */
+.glow-yellow { box-shadow: 0 0 24px rgba(250, 204, 21, 0.35); }
+
+/* Hide scrollbar but keep functional */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Tiny terminal blink */
+@keyframes term-blink {
+  0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; }
+}
+.term-cursor { animation: term-blink 1s steps(1) infinite; }
+
+/* Pulse for live indicator */
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+.pulse-dot { animation: pulse-dot 1.6s ease-in-out infinite; }
+
+/* Sweep highlight */
+@keyframes sweep {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.sweep-bg {
+  background: linear-gradient(90deg, transparent, rgba(250,204,21,0.25), transparent);
+  background-size: 200% 100%;
+  animation: sweep 2.4s linear infinite;
+}
+
+/* No text selection on game canvas */
+.no-select { user-select: none; -webkit-user-select: none; }
