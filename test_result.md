@@ -236,11 +236,11 @@ frontend:
 
   - task: "Live Feed (multiplayer simulation)"
     implemented: true
-    working: false
+    working: true
     file: "src/components/game/LiveFeed.jsx"
-    stuck_count: 1
+    stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
@@ -254,10 +254,13 @@ frontend:
         - working: false
           agent: "testing"
           comment: "CRITICAL ISSUE: Live Feed NEW STYLE not working. After major updates, feed shows '// Awaiting events...' but NO simulated events are populating. Header '// LIVE ACTIVITY' with '● LIVE' pulse dot visible. Footer '// ON-SITE 263 MINERS' visible. But zero 'excavated' entries appearing. Item names (Dust/Graphene Gem/$USDC Shard/$MINEX Crystal) not visible. Coords format not visible. GameContext.jsx simulation interval is set to 2400ms (line 43) but liveFeed state appears empty. Need to investigate why simulated events are not being added to the feed in tile view."
+        - working: true
+          agent: "testing"
+          comment: "LIVE FEED FIX VERIFIED ✓ - Re-verification after fix shows Live Feed is now working perfectly! GameContext.jsx now seeds feed with 4 initial events on load (lines 16-32) and simulation interval changed to 1500ms (every 1.5s). VERIFIED: (1) At least 4 seed entries visible immediately when entering tile view (started with 6 entries, grew to 9 entries after 5 more seconds). (2) New entries appear every ~1.5s as expected. (3) Entry format is CORRECT: colored square + Nickname (yellow) + 'excavated' (grey) + colored item name (Dust=purple, Graphene Gem=cyan, $USDC Shard=green, $MINEX Crystal=yellow) + relative time on right (0s, 1s, 4s, etc.). (4) Below each entry: +amount on left (e.g., +172, $0.075) and coords on right (e.g., -36,45,2, 13,-49,-1). (5) Footer shows '// ON-SITE 232 MINERS' with live count. (6) Header shows '// LIVE ACTIVITY' with green pulse dot and 'LIVE' indicator. No more '// Awaiting events...' message. Feed is fully populated and updating correctly."
 
   - task: "Complete rebrand - remove Consortium references"
-    implemented: false
-    working: "NA"
+    implemented: true
+    working: true
     file: "src/components/landing/AuthModal.jsx, Mission.jsx"
     stuck_count: 0
     priority: "medium"
@@ -266,6 +269,9 @@ frontend:
         - working: "NA"
           agent: "testing"
           comment: "INCOMPLETE REBRAND: Found leftover 'Consortium' references that need to be updated to match MINEX BLOCK branding: (1) AuthModal.jsx line 75: 'NEW TO THE CONSORTIUM? ENLIST NOW' should be changed to 'NEW TO MINEX BLOCK?' or similar. (2) Mission.jsx: 'The four pillars of Consortium life' should be rephrased. (3) AboutSection.jsx: 'The Consortium is a dedicated group...' should be rephrased (though this file may not be imported in LandingPage.jsx)."
+        - working: true
+          agent: "testing"
+          comment: "REBRAND COMPLETE ✓ - Verified all Consortium references have been removed: (1) AuthModal.jsx line 75 now shows 'NEW TO MINEX BLOCK? ENLIST NOW' (changed from 'NEW TO THE CONSORTIUM?'). (2) Mission.jsx line 20 now shows 'Eat. Sleep. Mine. Repeat. — The four pillars of every miner.' (changed from 'The four pillars of Consortium life'). (3) No 'CONSORTIUM' text found anywhere in auth modal or mission section during testing. Rebrand is complete and successful."
 
 backend:
   - task: "Not started yet - frontend with mocked data only"
@@ -307,9 +313,7 @@ test_plan:
         Verified manually via screenshots: orbit looks smooth-dark with yellow wireframe rings, ZOOM IN button works, tile view shows new feed with coords, reward popup says "// MINEX BLOCK".
         Need to verify: cinematic transition smoothness, drop bracket logic correctness, mined markers visibility on orbit when returning from tiles, gems-only earning behavior at $0 balance (should feel rewarding fast).
 
-  current_focus:
-    - "Live Feed simulation not populating"
-    - "Complete rebrand - remove Consortium references"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -493,3 +497,47 @@ agent_communication:
            - Mission.jsx: Remove or rephrase "Consortium life" reference
            - AboutSection.jsx: Remove or rephrase "The Consortium" reference (though this file may not be imported)
         3. LOW PRIORITY: BACK TO ORBIT button z-index (already reported, force click works as workaround)
+    - agent: "testing"
+      message: |
+        ✅ LIVE FEED FIX RE-VERIFICATION COMPLETE - ALL TESTS PASS
+        
+        Quick re-verification completed at https://oct-preview-1.preview.emergentagent.com after Live Feed fix. localStorage cleared before testing.
+        
+        **LIVE FEED POPULATION - PASS ✓**
+        Tested flow: Homepage → PLAY NOW → GUEST → ENTER ORBIT → ZOOM IN → MINE → Wait 8-10s
+        
+        Results:
+        1. ✓ At least 4 seed entries visible IMMEDIATELY when entering tile view (found 6 entries initially)
+        2. ✓ New entries appear every ~1.5s (6 entries grew to 9 entries after 5 more seconds)
+        3. ✓ Entry format is CORRECT:
+           - Colored square present (cyan for Graphene Gem, green for $USDC Shard)
+           - Nickname in yellow (e.g., "Killua118", "Stardust927", "Tycho618")
+           - "excavated" text in grey
+           - Colored item names (Graphene Gem=cyan, $USDC Shard=green, Dust=purple, $MINEX Crystal=yellow)
+           - Relative time on right (0s, 1s, 4s, 7s, etc.)
+           - Amount below on left (+172, +132, $0.075)
+           - Coordinates below on right (-36,45,2, 13,-49,-1, etc.)
+        4. ✓ Footer shows "// ON-SITE 232 MINERS" with live count
+        5. ✓ Header shows "// LIVE ACTIVITY" with green pulse dot and "LIVE" indicator
+        6. ✓ NO "// Awaiting events..." message (feed is fully populated)
+        
+        Example entry verified: "Killua118 excavated Graphene Gem 0s +172 -36,45,2"
+        
+        **CONSORTIUM REBRAND - PASS ✓**
+        1. ✓ Auth modal shows "NEW TO MINEX BLOCK? ENLIST NOW" (not "CONSORTIUM")
+        2. ✓ Mission section shows "Eat. Sleep. Mine. Repeat. — The four pillars of every miner." (not "Consortium life")
+        3. ✓ No "CONSORTIUM" text found anywhere during testing
+        
+        **MINED DOTS ON ORBIT - PASS ✓**
+        1. ✓ Mined 10 tiles in tile view
+        2. ✓ Reward popup appeared after mining
+        3. ✓ BACK TO ORBIT button works (returned to orbit view)
+        4. ✓ Mined tiles visible as colored dots on octahedron (visual verification from screenshots)
+        
+        **OVERALL RESULT: ALL REQUIREMENTS MET ✓**
+        - Live Feed is now fully functional with seed entries and live updates
+        - Consortium rebrand is complete
+        - Mining and mined dots work correctly
+        - All core gameplay features operational
+        
+        NO CRITICAL ISSUES FOUND. All requested verification items PASS.

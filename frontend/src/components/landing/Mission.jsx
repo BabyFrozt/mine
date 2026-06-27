@@ -17,7 +17,7 @@ export default function Mission() {
           <span className="font-mono text-[10px] tracking-[0.2em] text-stone-500">THE MISSION</span>
         </div>
         <h2 className="font-display text-white text-[14vw] md:text-[8rem] leading-none">THE MISSION</h2>
-        <p className="font-mono text-sm text-stone-400 mt-6 max-w-2xl">Eat. Sleep. Mine. Repeat. — The four pillars of Consortium life.</p>
+        <p className="font-mono text-sm text-stone-400 mt-6 max-w-2xl">Eat. Sleep. Mine. Repeat. — The four pillars of every miner.</p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-14">
           {items.map((it) => {

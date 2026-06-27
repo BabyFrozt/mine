@@ -72,7 +72,7 @@ export default function AuthModal({ open, onOpenChange }) {
                 AUTHENTICATE <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
               <p className="font-mono text-[10px] tracking-[0.2em] text-stone-500">
-                NEW TO THE CONSORTIUM? <button type="button" onClick={() => setTab('guest')} className="text-yellow-400 underline">ENLIST NOW</button>
+                NEW TO MINEX BLOCK? <button type="button" onClick={() => setTab('guest')} className="text-yellow-400 underline">ENLIST NOW</button>
               </p>
             </form>
           </TabsContent>

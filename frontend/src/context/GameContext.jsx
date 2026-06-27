@@ -13,7 +13,23 @@ export function GameProvider({ children }) {
     } catch (e) { /* ignore */ }
     return null;
   });
-  const [liveFeed, setLiveFeed] = useState(MOCK_LIVE_FEED_SEED);
+  const [liveFeed, setLiveFeed] = useState(() => {
+    // Seed with a few initial events so feed isn't empty
+    const seed = [];
+    for (let i = 0; i < 4; i++) {
+      const tier = 1 + Math.floor(Math.random() * 5);
+      const fakeUsdc = Math.random() * 8;
+      let r = rollReward(tier, fakeUsdc);
+      // Force non-zonk for seed
+      let attempts = 0;
+      while (r.type === 'zonk' && attempts < 6) { r = rollReward(tier, fakeUsdc); attempts++; }
+      if (r.type === 'zonk') continue;
+      const x = Math.floor(Math.random() * 200);
+      const y = Math.floor(Math.random() * 140);
+      seed.push({ id: Date.now() + i + Math.random(), nick: randomNick(), reward: r, coords: { x, y }, ts: Date.now() - (i + 1) * 4000 });
+    }
+    return seed;
+  });
   const [onlineCount, setOnlineCount] = useState(248);
   const [rewardPopup, setRewardPopup] = useState(null);
 
@@ -24,12 +40,13 @@ export function GameProvider({ children }) {
   // Simulated live feed of other players
   useEffect(() => {
     const interval = setInterval(() => {
-      // Random reward event from another player
-      if (Math.random() < 0.7) {
-        const tier = 1 + Math.floor(Math.random() * 5);
-        const fakeUsdc = Math.random() * 8; // simulate various brackets
-        const r = rollReward(tier, fakeUsdc);
-        if (r.type === 'zonk') return;
+      const tier = 1 + Math.floor(Math.random() * 5);
+      const fakeUsdc = Math.random() * 8;
+      let r = rollReward(tier, fakeUsdc);
+      // Re-roll once or twice to avoid empty feed (most rolls are zonk)
+      let attempts = 0;
+      while (r.type === 'zonk' && attempts < 3) { r = rollReward(tier, fakeUsdc); attempts++; }
+      if (r.type !== 'zonk') {
         const nick = randomNick();
         const x = Math.floor(Math.random() * 200);
         const y = Math.floor(Math.random() * 140);
@@ -38,9 +55,8 @@ export function GameProvider({ children }) {
           ...prev.slice(0, 24),
         ]);
       }
-      // wiggle online count
       setOnlineCount((c) => Math.max(120, c + (Math.floor(Math.random() * 7) - 3)));
-    }, 2400);
+    }, 1500);
     return () => clearInterval(interval);
   }, []);
 
