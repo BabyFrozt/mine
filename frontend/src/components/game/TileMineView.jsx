@@ -203,7 +203,7 @@ export default function TileMineView({ onMine, tiles, onBack, viewportTitle = 'O
         <div className="font-mono text-xs tracking-[0.18em] text-yellow-400">{viewportTitle}</div>
       </div>
       {/* Back to orbit */}
-      <button onClick={onBack} className="absolute bottom-3 left-3 md:bottom-auto md:top-5 md:left-1/2 md:-translate-x-1/2 h-10 px-4 border border-yellow-400/40 bg-black/85 font-mono text-[11px] tracking-[0.2em] text-stone-200 hover:text-yellow-400 hover:border-yellow-400 transition-colors flex items-center gap-2 z-10">
+      <button onClick={onBack} className="absolute bottom-20 md:bottom-3 left-3 h-10 px-4 border border-yellow-400/40 bg-black/85 font-mono text-[11px] tracking-[0.2em] text-stone-200 hover:text-yellow-400 hover:border-yellow-400 transition-colors flex items-center gap-2 z-30">
         <ChevronLeft className="w-4 h-4" /> BACK TO ORBIT
       </button>
       {/* Zoom hint */}
