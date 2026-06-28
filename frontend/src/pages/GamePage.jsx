@@ -10,23 +10,24 @@ import Wallet from '../components/game/Wallet';
 import Profile from '../components/game/Profile';
 import { useGame } from '../context/GameContext';
 import { rollReward, TIER_DATA } from '../mock';
-import { X, ChevronRight } from 'lucide-react';
+import { X, ChevronRight, ChevronDown } from 'lucide-react';
 
 const COLS = 200;
 const ROWS = 140;
+const TOTAL_TILES = COLS * ROWS;
 
 export default function GamePage() {
-  const { player, activeTool, consumeToolUses, addReward, setRewardPopup, pushFeedEvent } = useGame();
-  const [view, setView] = useState('orbit'); // 'orbit' | 'tiles'
-  const [transition, setTransition] = useState('idle'); // 'idle' | 'zoom-in' | 'fade-in'
-  const [tiles, setTiles] = useState(() => new Map()); // 'x,y' -> { type, by }
-  const [shop, setShop] = useState(false);
-  const [inv, setInv] = useState(false);
-  const [wallet, setWallet] = useState(false);
-  const [profile, setProfile] = useState(false);
-  const [feedOpen, setFeedOpen] = useState(true);
+  const { player, activeTool, consumeDigUses, consumeDurability, addReward, setRewardPopup, pushFeedEvent } = useGame();
+  const [view,       setView]       = useState('orbit');
+  const [transition, setTransition] = useState('idle');
+  const [tiles,      setTiles]      = useState(() => new Map());
+  const [shop,       setShop]       = useState(false);
+  const [inv,        setInv]        = useState(false);
+  const [wallet,     setWallet]     = useState(false);
+  const [profile,    setProfile]    = useState(false);
+  const [feedOpen,   setFeedOpen]   = useState(true);
 
-  // Simulate other players mining tiles (so multiplayer feel)
+  // Simulate other players mining tiles
   useEffect(() => {
     const id = setInterval(() => {
       const reward = ['gems', 'usdc', 'minex', 'zonk', 'zonk', 'zonk', 'gems'][Math.floor(Math.random() * 7)];
@@ -49,8 +50,8 @@ export default function GamePage() {
   }, []);
 
   const handleMine = useCallback((tx, ty) => {
-    if (!activeTool || activeTool.broken || activeTool.uses <= 0) return;
-    const tier = activeTool.tier;
+    if (!activeTool || activeTool.broken || activeTool.digUses <= 0) return;
+    const tier  = activeTool.tier;
     const range = TIER_DATA[tier].range;
 
     const candidates = [];
@@ -65,7 +66,7 @@ export default function GamePage() {
       }
     }
     candidates.sort((a, b) => a.d - b.d);
-    const toMine = candidates.slice(0, Math.min(range, activeTool.uses));
+    const toMine = candidates.slice(0, Math.min(range, activeTool.digUses));
     if (toMine.length === 0) return;
 
     let best = null;
@@ -87,19 +88,18 @@ export default function GamePage() {
       return next;
     });
 
-    consumeToolUses(toMine.length);
+    consumeDigUses(toMine.length);
+    consumeDurability();
 
     if (best) {
       addReward(best);
       setRewardPopup(best);
       pushFeedEvent({ nick: player.nickname, reward: best, coords: firstMinedCoord });
     } else if (firstMinedCoord) {
-      // Also show zonk in feed (just dust)
       pushFeedEvent({ nick: player.nickname, reward: { type: 'zonk', final: 0 }, coords: firstMinedCoord });
     }
-  }, [activeTool, tiles, consumeToolUses, addReward, setRewardPopup, pushFeedEvent, player]);
+  }, [activeTool, tiles, consumeDigUses, consumeDurability, addReward, setRewardPopup, pushFeedEvent, player]);
 
-  // Handle zoom-in transition
   const beginEnter = () => {
     if (transition !== 'idle') return;
     setTransition('zoom-in');
@@ -118,6 +118,8 @@ export default function GamePage() {
 
   if (!player) return null;
 
+  const minedPct = ((tiles.size / TOTAL_TILES) * 100).toFixed(2);
+
   return (
     <div className="relative w-full h-screen bg-black overflow-hidden no-select">
       {view === 'orbit' && (
@@ -129,44 +131,72 @@ export default function GamePage() {
         />
       )}
       {view === 'tiles' && (
-        <TileMineView tiles={tiles} onMine={handleMine} onBack={goBackToOrbit} />
+        <TileMineView tiles={tiles} onMine={handleMine} onBack={goBackToOrbit} minedPct={minedPct} />
       )}
 
       {/* Black fade overlay during transition */}
       <div
-        className={`absolute inset-0 bg-black pointer-events-none transition-opacity duration-500 z-40 ${transition === 'zoom-in' ? 'opacity-100' : transition === 'fade-in' ? 'opacity-0' : 'opacity-0'}`}
+        className={`absolute inset-0 bg-black pointer-events-none transition-opacity z-40 ${transition === 'zoom-in' ? 'opacity-100' : 'opacity-0'}`}
         style={{ transitionDuration: transition === 'zoom-in' ? '900ms' : '380ms' }}
       />
 
       <HUD
-        openShop={() => setShop(true)}
+        openShop={()    => setShop(true)}
         openInventory={() => setInv(true)}
-        openWallet={() => setWallet(true)}
-        openProfile={() => setProfile(true)}
+        openWallet={()  => setWallet(true)}
+        openProfile={()  => setProfile(true)}
       />
 
-      {/* Live feed sidebar - only show in tile view */}
+      {/* Live feed — desktop: side panel, mobile: bottom tray */}
       {view === 'tiles' && (
         <>
+          {/* Desktop side panel */}
           <div className={`hidden md:flex absolute bottom-24 left-3 top-32 w-80 transition-transform ${feedOpen ? '' : '-translate-x-[110%]'} z-10`}>
             <div className="relative h-full w-full">
               <LiveFeed />
-              <button onClick={() => setFeedOpen(false)} className="absolute -right-9 top-3 w-8 h-8 border border-yellow-400/40 bg-black/85 flex items-center justify-center text-stone-200 hover:text-yellow-400"><X className="w-4 h-4" /></button>
+              <button
+                onClick={() => setFeedOpen(false)}
+                className="absolute -right-9 top-3 w-8 h-8 border border-yellow-400/40 bg-black/85 flex items-center justify-center text-stone-200 hover:text-yellow-400"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
           </div>
           {!feedOpen && (
-            <button onClick={() => setFeedOpen(true)} className="hidden md:flex absolute bottom-24 left-3 h-10 px-3 border border-yellow-400/40 bg-black/85 font-mono text-[11px] tracking-[0.2em] text-stone-200 hover:text-yellow-400 items-center z-10">
+            <button
+              onClick={() => setFeedOpen(true)}
+              className="hidden md:flex absolute bottom-24 left-3 h-10 px-3 border border-yellow-400/40 bg-black/85 font-mono text-[11px] tracking-[0.2em] text-stone-200 hover:text-yellow-400 items-center z-10"
+            >
               <ChevronRight className="w-4 h-4 mr-1" /> LIVE FEED
             </button>
           )}
+
+          {/* Mobile bottom tray */}
+          <div className={`md:hidden absolute left-0 right-0 z-10 transition-all duration-300 ${feedOpen ? 'bottom-[88px]' : 'bottom-[88px] translate-y-[calc(100%-2.5rem)]'}`}>
+            <div className="bg-black/95 border border-yellow-400/25 flex flex-col" style={{ maxHeight: '40vh' }}>
+              <button
+                onClick={() => setFeedOpen((v) => !v)}
+                className="flex items-center justify-between px-4 py-2.5 w-full border-b border-yellow-400/20 shrink-0"
+              >
+                <span className="font-mono text-[11px] tracking-[0.2em] text-yellow-400 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-green-400 inline-block" />
+                  LIVE FEED
+                </span>
+                <ChevronDown className={`w-4 h-4 text-stone-400 transition-transform ${feedOpen ? '' : 'rotate-180'}`} />
+              </button>
+              <div className="overflow-y-auto no-scrollbar flex-1">
+                <LiveFeed compact />
+              </div>
+            </div>
+          </div>
         </>
       )}
 
       <RewardPopup />
-      <Shop open={shop} onOpenChange={setShop} />
-      <Inventory open={inv} onOpenChange={setInv} />
-      <Wallet open={wallet} onOpenChange={setWallet} />
-      <Profile open={profile} onOpenChange={setProfile} />
+      <Shop     open={shop}    onOpenChange={setShop}    />
+      <Inventory open={inv}    onOpenChange={setInv}     />
+      <Wallet   open={wallet}  onOpenChange={setWallet}  />
+      <Profile  open={profile} onOpenChange={setProfile} />
     </div>
   );
 }

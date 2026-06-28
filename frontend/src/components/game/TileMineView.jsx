@@ -15,7 +15,7 @@ const COLORS = {
   minex: '#facc15',
 };
 
-export default function TileMineView({ onMine, tiles, onBack, viewportTitle = 'ORBIT 04-X · FACE A' }) {
+export default function TileMineView({ onMine, tiles, onBack, minedPct = '0.00', viewportTitle = 'ORBIT 04-X · FACE A' }) {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const [scale, setScale] = useState(1);
@@ -24,14 +24,24 @@ export default function TileMineView({ onMine, tiles, onBack, viewportTitle = 'O
   const animatingTiles = useRef(new Map()); // key -> { start, color }
   const [, force] = useState(0);
 
+  const clampOffset = useCallback((ox, oy, sc) => {
+    const c = containerRef.current;
+    if (!c) return { x: ox, y: oy };
+    const vw = c.clientWidth, vh = c.clientHeight;
+    const ww = COLS * BASE_TILE * sc, wh = ROWS * BASE_TILE * sc;
+    const cx = ww <= vw ? (vw - ww) / 2 : Math.min(0, Math.max(vw - ww, ox));
+    const cy = wh <= vh ? (vh - wh) / 2 : Math.min(0, Math.max(vh - wh, oy));
+    return { x: cx, y: cy };
+  }, []);
+
   // Center initially
   useEffect(() => {
     const c = containerRef.current;
     if (!c) return;
     const w = c.clientWidth, h = c.clientHeight;
     const worldW = COLS * BASE_TILE, worldH = ROWS * BASE_TILE;
-    setOffset({ x: (w - worldW) / 2, y: (h - worldH) / 2 });
-  }, []);
+    setOffset(clampOffset((w - worldW) / 2, (h - worldH) / 2, 1));
+  }, [clampOffset]);
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -159,7 +169,7 @@ export default function TileMineView({ onMine, tiles, onBack, viewportTitle = 'O
     const dx = e.clientX - d.startX;
     const dy = e.clientY - d.startY;
     if (Math.abs(dx) + Math.abs(dy) > 4) d.moved = true;
-    if (d.moved) setOffset({ x: d.baseX + dx, y: d.baseY + dy });
+    if (d.moved) setOffset(clampOffset(d.baseX + dx, d.baseY + dy, scale));
   };
   const onPointerUp = (e) => {
     const d = draggingRef.current;
@@ -175,13 +185,13 @@ export default function TileMineView({ onMine, tiles, onBack, viewportTitle = 'O
     e.preventDefault();
     const factor = e.deltaY > 0 ? 0.9 : 1.1;
     const newScale = Math.max(0.4, Math.min(2.4, scale * factor));
-    // zoom toward cursor
     const rect = canvasRef.current.getBoundingClientRect();
     const cx = e.clientX - rect.left;
     const cy = e.clientY - rect.top;
     const wx = (cx - offset.x) / scale;
     const wy = (cy - offset.y) / scale;
-    setOffset({ x: cx - wx * newScale, y: cy - wy * newScale });
+    const raw = { x: cx - wx * newScale, y: cy - wy * newScale };
+    setOffset(clampOffset(raw.x, raw.y, newScale));
     setScale(newScale);
   };
 
@@ -201,6 +211,7 @@ export default function TileMineView({ onMine, tiles, onBack, viewportTitle = 'O
       <div className="absolute top-3 left-3 md:top-5 md:left-5 pointer-events-none">
         <div className="font-mono text-[10px] tracking-[0.25em] text-stone-500 mb-1">// LOCATION</div>
         <div className="font-mono text-xs tracking-[0.18em] text-yellow-400">{viewportTitle}</div>
+        <div className="font-mono text-[10px] tracking-[0.2em] text-stone-500 mt-1">{minedPct}% EXCAVATED</div>
       </div>
       {/* Back to orbit */}
       <button onClick={onBack} className="absolute bottom-20 md:bottom-3 left-3 h-10 px-4 border border-yellow-400/40 bg-black/85 font-mono text-[11px] tracking-[0.2em] text-stone-200 hover:text-yellow-400 hover:border-yellow-400 transition-colors flex items-center gap-2 z-30">

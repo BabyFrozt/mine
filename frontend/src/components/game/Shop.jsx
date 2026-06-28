@@ -54,7 +54,7 @@ export default function Shop({ open, onOpenChange }) {
                     </div>
                     <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1 font-mono text-[10px] tracking-[0.18em] text-stone-400">
                       <span>RANGE {d.range}</span>
-                      <span>USES {d.maxUses}</span>
+                      <span>USES {d.maxDigUses}/DAY</span>
                       <span className="text-green-400">+{d.boost}%</span>
                     </div>
                   </div>

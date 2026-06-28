@@ -11,8 +11,31 @@ function relTime(ts) {
   return `${Math.floor(m / 60)}h`;
 }
 
-export default function LiveFeed() {
+export default function LiveFeed({ compact = false }) {
   const { liveFeed, onlineCount } = useGame();
+
+  if (compact) {
+    return (
+      <div className="w-full">
+        {liveFeed.length === 0 && (
+          <div className="px-4 py-2 font-mono text-[10px] text-stone-500">// Awaiting events...</div>
+        )}
+        {liveFeed.map((ev) => {
+          const rType = ev.reward?.type || 'gems';
+          const color = ITEM_COLORS[rType] || '#a78bfa';
+          const itemName = ITEM_NAMES[rType] || 'Item';
+          return (
+            <div key={ev.id} className="px-3 py-1.5 border-b border-yellow-400/10 flex items-center gap-2">
+              <span className="w-2 h-2 shrink-0 rounded-sm" style={{ background: color }} />
+              <span className="font-mono text-[10px] text-yellow-400 truncate max-w-[80px]">{ev.nick}</span>
+              <span className="font-mono text-[10px] text-stone-500 truncate flex-1" style={{ color }}>{itemName}{ev.reward?.final ? ` +${ev.reward.final.toLocaleString()}` : ''}</span>
+              <span className="font-mono text-[10px] text-stone-600 shrink-0">{relTime(ev.ts)}</span>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
 
   return (
     <div className="w-full md:w-80 bg-black/85 border border-yellow-400/25 backdrop-blur-sm flex flex-col h-full">
